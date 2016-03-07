@@ -1,0 +1,25 @@
+General assembly syntax:
+"Opcode <argument,argument> output" where the VAL was not used
+"Opcode <argument,argument> VAL" where VAL is used
+
+Example for each opcode group:
+Syntax will be identical between opcodes of a common group
+
+EX: LDI 3 1234 > C3001234
+  Loads (hex) value "1234" into register 3
+
+EX: JMP 1234   > 1F001234
+	Jumps to (hex) address "1234"
+
+EX: JMZ D,9 10F0 > 2FD910F0
+	Compares the values in registers D and 9; if they are equal, then jumps to (hex) address 10F0
+
+EX: ADD D,3 2 > 42D30000
+	Adds the values in registers D and 3, stores the result in register 2
+	
+EX: WTR A B > 80AB0000
+	Writes the data in register A into the address specified in register B
+	
+EX: INP TODO
+
+EX: WOP TODO
