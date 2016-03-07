@@ -19,7 +19,7 @@ public enum OpCodes {
 	 * VAL is Jump address
 	 * EX: 1F1110F0 jumps to address 10F0
 	 */
-	JMP (0x1, "JMP"),
+	JMP ('1', "JMP"),
     
 	/**
      * Set NREG to "F"
@@ -27,50 +27,50 @@ public enum OpCodes {
      * - Will jump if A == B
      * EX: 2FD910F0 compares register D (A) and register 9 (B) 
      */
-	JMZ (0x2, "JMZ"),
+	JMZ ('2', "JMZ"),
     
 	/**
      * Set NREG to "F"
      * Choose a register for R1 and R2 to be compared
      * - Will jump if A < B
      */    
-	JNG (0x3, "JNG"),
+	JNG ('3', "JNG"),
     
 	/**
      * R1 = A
      * R2 = B
      * TODO A+B?
      */
-    ADD (0x4, "ADD"),
+    ADD ('4', "ADD"),
     
     /**
      * R1 = A
      * R2 = B
      * TODO A-B?
      */    
-    SUB (0x5, "SUB"),
+    SUB ('5', "SUB"),
     
     /**
      * TODO
      */
-    MUL (0x6, "SUB"),
+    MUL ('6', "SUB"),
     
     /**
      * TODO
      */
-    DIV (0x7, "DIV"),
+    DIV ('7', "DIV"),
     
     /**
      * R1 = Data
      * R2 = Address (from register E and F)
      * 
      */
-    WTR (0x8, "WTR"),
+    WTR ('8', "WTR"),
     
     /**
      * TODO
      */
-    INP (0x9, "INP"),
+    INP ('9', "INP"),
     
     /**
      * R1 = (X,Y)
@@ -78,12 +78,12 @@ public enum OpCodes {
      * 		YYXX
      * R2 = (Color 15bit RGB)
      */
-    WOP (0xA, "WOP"),
+    WOP ('A', "WOP"),
     
     /**
      * TODO
      */
-    RES (0xB, "RES"),
+    RES ('B', "RES"),
     
     /**
      * Use NREG to select reg to input
@@ -91,13 +91,13 @@ public enum OpCodes {
      * 
      * 
      */
-    LDI (0xC, "LDI");
+    LDI ('C', "LDI");
     
 
-    public final int hexCode;
+    public final char hexCode;
     public final String stringValue;
     
-    OpCodes(int hexCode, String stringValue) {
+    OpCodes(char hexCode, String stringValue) {
         this.hexCode = hexCode;
         this.stringValue = stringValue;
     }
@@ -105,7 +105,7 @@ public enum OpCodes {
      * @return Hex value of opcode
      */
     @SuppressWarnings("unused")
-	private int hexCode() { return hexCode; }
+	private char hexCode() { return hexCode; }
     /**
      * @return Alphanumeric String literal for opcode entry
      */
