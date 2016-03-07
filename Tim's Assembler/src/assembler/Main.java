@@ -5,7 +5,7 @@ import org.apache.commons.cli.*;
 
 public class Main {
 	static String fileInput, fileOutput;
-	static boolean isVerbose, isDebug;
+	static boolean isVerbose, isDebug, isReverse;
 	
 	public static void main( String[] args ) {
 		//Initialize command line arguments with default values
@@ -13,6 +13,7 @@ public class Main {
 		fileOutput = System.getProperty("user.dir").concat("/output.bin");
 		isVerbose = false;
 		isDebug = false;
+		isReverse = false;
 		
 		//Use console input to set argument values
 		getConsoleInput(args);
@@ -25,7 +26,10 @@ public class Main {
         try (FileReader fileReader = new FileReader(fileInput);
             BufferedReader bufferedReader = new BufferedReader(fileReader);){
             while((line = bufferedReader.readLine()) != null) {
-                interpretLine(line, resultBuilder);
+                if (!isReverse)
+                	interpretForward(line, resultBuilder);
+                else
+                	interpretReverse(line, resultBuilder);
             }
             bufferedReader.close();
             fileReader.close();
@@ -42,6 +46,7 @@ public class Main {
         //Write raw bytes of the now assembled machine code to output file
         try (PrintWriter out = new PrintWriter(fileOutput)) {
         	out.print(resultBuilder.toString());
+        	out.close();
         }
         catch (FileNotFoundException ex) {
         	System.out.println("Error opening output file.");
@@ -49,12 +54,15 @@ public class Main {
         
         System.out.println("Operation completed successfully");
 	}
-	
+	/**Sets options according to command-line input
+	 * @param Command-line arguments determined on run-time
+	 */
 	public static void getConsoleInput(String[] args) {
 		Options options = new Options();
 		Option help = new Option("h", "help", false, "print this message" );
 		Option verbose = new Option("v", "verbose", false, "be extra verbose" );
 		Option debug = new Option("d", "debug", false, "print debugging information" );
+		Option reverse = new Option("r", "reverse", false, "disassemble input file from machine code into assembly");
 		Option filein = new Option("i", "filein", true, "use given file for input (default: \"input.txt\" in current directory)");
 		Option fileout = new Option("o", "fileout", true, "use given file for output (default: \"output.bin\" in current directory)");
 		
@@ -73,6 +81,9 @@ public class Main {
 	    if (line.hasOption(debug.getOpt())) {
 	    	isDebug= true;
 	    }
+	    if (line.hasOption(reverse.getOpt())) {
+	    	isReverse= true;
+	    }
 	    if (line.hasOption(help.getOpt())) {
 	    	HelpFormatter formatter = new HelpFormatter();
 	    	formatter.printHelp( "Assemble <args> -i <filein> -o <fileout>", options );
@@ -85,8 +96,7 @@ public class Main {
 	    }
 	}
 	
-	
-	/**
+	/**Interprets assembly language code into machine code
 	 * @param Alphanumeric assembly code
 	 * @return Hex machine code equivalent
 	 * EX: LDI 3 1234 > C3001234
@@ -109,7 +119,7 @@ public class Main {
 	 * EX: WOP TODO
 	 * WOP A,B
 	 */
-	public static String interpretLine(String line, StringBuilder resultBuilder) {
+	public static String interpretForward(String line, StringBuilder resultBuilder) {
 
 		if (line.toUpperCase().startsWith(OpCodes.JMP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.JMP.hexCode));
@@ -193,11 +203,25 @@ public class Main {
 		else if (line.toUpperCase().startsWith(OpCodes.RES.toString())){
 			
 		}
+		else if (line.toUpperCase().startsWith("#") || line.toUpperCase().startsWith("//") || line.toUpperCase().startsWith(";")){
+			//Skip commented line
+			if (isVerbose || isDebug)
+				System.out.println("Skipped commented line: " + line);
+		}
 		else {
 			System.out.println("Error parsing assembly on line: \"" + line + "\"");
 		}
 		if (isDebug)
 			System.out.println(resultBuilder.toString());
 		return resultBuilder.toString();
+	}
+	
+	/**Interprets machine code into assembly language
+	 * @param Hex machine code equivalent
+	 * @return Alphanumeric assembly code
+	 */
+	public static String interpretReverse(String line, StringBuilder resultBuilder) {
+		//TODO Complete
+		return null;
 	}
 }
