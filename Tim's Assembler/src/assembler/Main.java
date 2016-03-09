@@ -209,15 +209,13 @@ public class Main {
 			resultBuilder.append('0');
 			resultBuilder.append(line.charAt(line.indexOf(',')-1));
 			resultBuilder.append(line.charAt(line.indexOf(',')+1));
-			resultBuilder.append("0000");
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.INP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.INP.hexCode));
-			resultBuilder.append('0');
-			resultBuilder.append(line.charAt(line.indexOf(',')-1));
-			resultBuilder.append(line.charAt(line.indexOf(',')+1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			resultBuilder.append(line.charAt(line.indexOf(' ')+1));
+			resultBuilder.append("000000");
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.RES.toString())){
