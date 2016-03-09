@@ -108,16 +108,17 @@ public class Main {
 	 * EX: JMZ D,9 10F0 > 2FD910F0
 	 * Compares the values in registers D and 9; if they are equal, then jumps to (hex) address 10F0
 	 * 
-	 * EX: ADD D,3 2 > 42D30000
+	 * EX: ADD D,3,2 0000> 42D30000
 	 * Adds the values in registers D and 3, stores the result in register 2
 	 * 
 	 * EX: WTR A B > 80AB0000
 	 * Writes the data in register A into the address specified in register B
 	 * 
-	 * EX: INP TODO
+	 * EX: INP A > 9A000000
+	 * Inputs item from keyboard into register
 	 * 
-	 * EX: WOP TODO
-	 * WOP A,B
+	 * EX: WOP A,B 0000 > A0AB0000
+	 * Writes 1 pixel to screen
 	 */
 	public static String interpretForward(String line, StringBuilder resultBuilder) {
 
@@ -160,7 +161,8 @@ public class Main {
 			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
 			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
 			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append("0000");
+			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.SUB.toString())){
@@ -169,7 +171,8 @@ public class Main {
 			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
 			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
 			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append("0000");
+			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.MUL.toString())){
@@ -178,11 +181,23 @@ public class Main {
 			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
 			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
 			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append("0000");
+			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			resultBuilder.append('\n');
+		}
+		else if (line.toUpperCase().startsWith(OpCodes.DIV.toString())){
+			resultBuilder.append(String.valueOf(OpCodes.DIV.hexCode));
+			resultBuilder.append(line.charAt(line.length()-1)); //Last character
+			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
+			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.WTR.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.WTR.hexCode));
+			resultBuilder.append('0');
 			resultBuilder.append(line.charAt(line.indexOf(' ') + 1));
 			resultBuilder.append(line.charAt(line.lastIndexOf(' ') + 1)); //Character after last space
 			//resultBuilder.append(line.charAt(line.length()-1)); Alternatively use the last character
@@ -198,10 +213,16 @@ public class Main {
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.INP.toString())){
-			
+			resultBuilder.append(String.valueOf(OpCodes.INP.hexCode));
+			resultBuilder.append('0');
+			resultBuilder.append(line.charAt(line.indexOf(',')-1));
+			resultBuilder.append(line.charAt(line.indexOf(',')+1));
+			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.RES.toString())){
-			
+			resultBuilder.append(String.valueOf(OpCodes.RES.hexCode));
+			resultBuilder.append("0000000");
 		}
 		else if (line.toUpperCase().startsWith("#") || line.toUpperCase().startsWith("//") || line.toUpperCase().startsWith(";")){
 			//Skip commented line
