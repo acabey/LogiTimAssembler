@@ -26,6 +26,7 @@ public class Main {
         try (FileReader fileReader = new FileReader(fileInput);
             BufferedReader bufferedReader = new BufferedReader(fileReader);){
             while((line = bufferedReader.readLine()) != null) {
+            	cleanString(line, resultBuilder);
                 if (!isReverse)
                 	interpretForward(line, resultBuilder);
                 else
@@ -96,6 +97,30 @@ public class Main {
 	    }
 	}
 	
+	public static String cleanString(String line, StringBuilder resultBuilder) {
+		//Remove commented sections
+		if (line.contains(";") || line.contains("//") || line.contains("#")) {
+			line.replace(line.substring(line.indexOf(';'), line.length()-1), "");
+			line.replace(line.substring(line.indexOf("//"), line.length()-1), "");
+			line.replace(line.substring(line.indexOf('#'), line.length()-1), "");
+		}
+		
+		//Remove all extra spaces
+		while (line.contains("  ")) {
+			line.replaceAll("  ", " ");
+		}
+		
+		//Remove spaces at beginning and end
+		while (line.startsWith(" ")) {
+			line.replace(line.substring(0, 0), "");
+		}
+		while (line.endsWith(" ")) {
+			line.replace(line.substring(line.length()-1, line.length()-1), "");
+		}
+		
+		return resultBuilder.toString();
+	}
+	
 	/**Interprets assembly language code into machine code
 	 * @param Alphanumeric assembly code
 	 * @return Hex machine code equivalent
@@ -108,7 +133,9 @@ public class Main {
 	 * EX: JMZ D,9 10F0 > 2FD910F0
 	 * Compares the values in registers D and 9; if they are equal, then jumps to (hex) address 10F0
 	 * 
-	 * EX: ADD D,3,2 0000> 42D30000
+	 * EX: ADD F,3 2 0001 > 42F30001
+	 * EX: ADD D,3 2 > 42D30000
+	 * Adds the values in VAL(register F) and register 3, stores the result in register 2
 	 * Adds the values in registers D and 3, stores the result in register 2
 	 * 
 	 * EX: WTR A B > 80AB0000
@@ -121,12 +148,14 @@ public class Main {
 	 * Writes 1 pixel to screen
 	 */
 	public static String interpretForward(String line, StringBuilder resultBuilder) {
-
+		while (line.contains("  ")) {
+			line.replaceAll("  ", " ");
+		}
+		
 		if (line.toUpperCase().startsWith(OpCodes.JMP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.JMP.hexCode));
 			resultBuilder.append("F00");
 			resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Last four characters
-			//resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.JMZ.toString())){
@@ -156,43 +185,77 @@ public class Main {
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.ADD.toString())){
+			//EX: ADD F,3 2 0001 > 42F30001
+			//EX: ADD D,3 2 > 42D30000
 			resultBuilder.append(String.valueOf(OpCodes.ADD.hexCode));
-			resultBuilder.append(line.charAt(line.length()-1)); //Last character
-			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
-			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
-			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			if (line.toUpperCase().contains("F")) {
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append(line.charAt(line.length()-1)); // Last character
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.SUB.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.SUB.hexCode));
-			resultBuilder.append(line.charAt(line.length()-1)); //Last character
-			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
-			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
-			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			if (line.toUpperCase().contains("F")) {
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append(line.charAt(line.length()-1)); // Last character
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.MUL.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.MUL.hexCode));
-			resultBuilder.append(line.charAt(line.length()-1)); //Last character
-			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
-			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
-			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			if (line.toUpperCase().contains("F")) {
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append(line.charAt(line.length()-1)); // Last character
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.DIV.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.DIV.hexCode));
-			resultBuilder.append(line.charAt(line.length()-1)); //Last character
-			//resultBuilder.append(line.charAt(line.lastIndexOf(' ') +1)); //Character after last space
-			resultBuilder.append(line.charAt(line.indexOf(',') - 1));
-			resultBuilder.append(line.charAt(line.indexOf(',') + 1));
-			resultBuilder.append(line.charAt(line.lastIndexOf(',') + 1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			if (line.toUpperCase().contains("F")) {
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append(line.charAt(line.length()-1)); // Last character
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.WTR.toString())){
@@ -209,7 +272,7 @@ public class Main {
 			resultBuilder.append('0');
 			resultBuilder.append(line.charAt(line.indexOf(',')-1));
 			resultBuilder.append(line.charAt(line.indexOf(',')+1));
-			resultBuilder.append(line.substring(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4)); //Four characters after last space
+			resultBuilder.append(line.substring(Math.max(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4))); //Four characters after last space
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.INP.toString())){
@@ -232,6 +295,7 @@ public class Main {
 		}
 		if (isDebug)
 			System.out.println(resultBuilder.toString());
+		
 		return resultBuilder.toString();
 	}
 	
