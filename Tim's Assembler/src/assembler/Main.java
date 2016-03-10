@@ -67,6 +67,13 @@ public class Main {
 		Option filein = new Option("i", "filein", true, "use given file for input (default: \"input.txt\" in current directory)");
 		Option fileout = new Option("o", "fileout", true, "use given file for output (default: \"output.bin\" in current directory)");
 		
+		options.addOption(help);
+		options.addOption(verbose);
+		options.addOption(debug);
+		options.addOption(reverse);
+		options.addOption(filein);
+		options.addOption(fileout);
+		
 	    CommandLineParser parser = new DefaultParser();
 	    CommandLine line = null;
 	    try {
@@ -88,6 +95,9 @@ public class Main {
 	    if (line.hasOption(help.getOpt())) {
 	    	HelpFormatter formatter = new HelpFormatter();
 	    	formatter.printHelp( "Assemble <args> -i <filein> -o <fileout>", options );
+	    	
+	    	//Safely exit
+	    	System.exit(0);
 	    }
 	    if (line.hasOption(filein.getOpt())) {
 	    	fileInput = line.getOptionValue(filein.getOpt());
@@ -269,12 +279,22 @@ public class Main {
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.WOP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.WOP.hexCode));
-			resultBuilder.append('0');
-			resultBuilder.append(line.charAt(line.indexOf(',')-1));
-			resultBuilder.append(line.charAt(line.indexOf(',')+1));
-			resultBuilder.append(line.substring(Math.max(line.lastIndexOf(' '), line.lastIndexOf(' ') + 4))); //Four characters after last space
+			if (line.toUpperCase().contains("F")) {
+				//WOP F,D 0001 > A0FD0001
+				resultBuilder.append('0');	
+				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
+				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append('0');
+				resultBuilder.append(line.charAt(line.indexOf(',')-1));
+				resultBuilder.append(line.charAt(line.indexOf(',')+1));
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
+		
 		else if (line.toUpperCase().startsWith(OpCodes.INP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.INP.hexCode));
 			resultBuilder.append(line.charAt(line.indexOf(' ')+1));
