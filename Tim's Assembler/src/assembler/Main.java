@@ -11,8 +11,8 @@ public class Main {
 		//Initialize command line arguments with default values
 		fileInput = System.getProperty("user.dir").concat("/input.txt");
 		fileOutput = System.getProperty("user.dir").concat("/output.bin");
-		isVerbose = false;
-		isDebug = false;
+		isVerbose = true;
+		isDebug = true;
 		isReverse = false;
 		
 		//Use console input to set argument values
@@ -26,7 +26,7 @@ public class Main {
         try (FileReader fileReader = new FileReader(fileInput);
             BufferedReader bufferedReader = new BufferedReader(fileReader);){
             while((line = bufferedReader.readLine()) != null) {
-            	cleanString(line, resultBuilder);
+            	line = cleanString(line);
                 if (!isReverse)
                 	interpretForward(line, resultBuilder);
                 else
@@ -107,7 +107,7 @@ public class Main {
 	    }
 	}
 	
-	public static String cleanString(String line, StringBuilder resultBuilder) {
+	public static String cleanString(String line) {
 		//Remove commented sections
 		if (line.contains(";") || line.contains("//") || line.contains("#")) {
 			line.replace(line.substring(line.indexOf(';'), line.length()-1), "");
@@ -117,18 +117,17 @@ public class Main {
 		
 		//Remove all extra spaces
 		while (line.contains("  ")) {
-			line.replaceAll("  ", " ");
+			line = line.replaceAll("  ", " ");
 		}
 		
 		//Remove spaces at beginning and end
-		while (line.startsWith(" ")) {
-			line.replace(line.substring(0, 0), "");
+		while (line.charAt(0) == ' ') {
+			line = line.substring(1, line.length());
 		}
 		while (line.endsWith(" ")) {
-			line.replace(line.substring(line.length()-1, line.length()-1), "");
+			line = line.substring(0, line.length()-1);
 		}
-		
-		return resultBuilder.toString();
+		return line;
 	}
 	
 	/**Interprets assembly language code into machine code
@@ -158,10 +157,6 @@ public class Main {
 	 * Writes 1 pixel to screen
 	 */
 	public static String interpretForward(String line, StringBuilder resultBuilder) {
-		while (line.contains("  ")) {
-			line.replaceAll("  ", " ");
-		}
-		
 		if (line.toUpperCase().startsWith(OpCodes.JMP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.JMP.hexCode));
 			resultBuilder.append("F00");
