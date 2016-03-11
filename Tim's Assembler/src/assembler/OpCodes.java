@@ -88,11 +88,15 @@ public enum OpCodes {
     /**
      * Use NREG to select reg to input
      * VAL is loaded immediately
-     * 
-     * 
      */
-    LDI ('C', "LDI");
-    
+    LDI ('C', "LDI"),
+	
+	/**
+	 * NREG (second hex digit) selects which register to load data into 
+	 * R2 (3rd hex digit) is the address in RAM from which to load from. 
+	 * 	Note this can also be ‘f’ which grabs from VAL payload
+	 */
+	LDR ('D', "LDR");
 
     public final char hexCode;
     public final String stringValue;

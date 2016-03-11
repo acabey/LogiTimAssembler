@@ -106,7 +106,11 @@ public class Main {
 	    	fileOutput = line.getOptionValue(fileout.getOpt());
 	    }
 	}
-	
+
+	/**Cleans raw line read
+	 * @param Raw line from input stream
+	 * @return Cleaned line without commented sections or extra spaces
+	 */
 	public static String cleanString(String line) {
 		//Remove commented sections
 		if (line.contains(";") || line.contains("//") || line.contains("#")) {
@@ -155,6 +159,12 @@ public class Main {
 	 * 
 	 * EX: WOP A,B 0000 > A0AB0000
 	 * Writes 1 pixel to screen
+	 * 
+	 * EX: LDR D A > DAD00000
+	 * Loads data from memory address stored in register D into register A
+	 * 
+	 * EX: LDR F A 0110 > DAF00110
+	 * Loads data from memory address 0110 (register F) and stores in register A
 	 */
 	public static String interpretForward(String line, StringBuilder resultBuilder) {
 		if (line.toUpperCase().startsWith(OpCodes.JMP.toString())){
@@ -300,6 +310,23 @@ public class Main {
 			resultBuilder.append(String.valueOf(OpCodes.RES.hexCode));
 			resultBuilder.append("0000000");
 		}
+		else if (line.toUpperCase().startsWith(OpCodes.LDR.toString())) {
+			resultBuilder.append(String.valueOf(OpCodes.LDR.hexCode));
+			if (line.toUpperCase().contains("F")) {
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));	
+				resultBuilder.append(line.charAt(line.indexOf(' ')+1));
+				resultBuilder.append('0');
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append(line.charAt(line.length()-1)); // Last character
+				resultBuilder.append(line.charAt(line.indexOf(' ')+1));
+				resultBuilder.append("00000");
+			}
+			resultBuilder.append('\n');
+		}		
 		else if (line.toUpperCase().startsWith("#") || line.toUpperCase().startsWith("//") || line.toUpperCase().startsWith(";")){
 			//Skip commented line
 			if (isVerbose || isDebug)
