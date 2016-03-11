@@ -154,6 +154,9 @@ public class Main {
 	 * EX: WTR A B > 80AB0000
 	 * Writes the data in register A into the address specified in register B
 	 * 
+	 * EX: WTR F B 0110 > 80FB0110
+	 * Writes the data in VAL (register F) to register B
+	 * 
 	 * EX: INP A > 9A000000
 	 * Inputs item from keyboard into register
 	 * 
@@ -275,17 +278,26 @@ public class Main {
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.WTR.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.WTR.hexCode));
-			resultBuilder.append('0');
-			resultBuilder.append(line.charAt(line.indexOf(' ') + 1));
-			resultBuilder.append(line.charAt(line.lastIndexOf(' ') + 1)); //Character after last space
-			//resultBuilder.append(line.charAt(line.length()-1)); Alternatively use the last character
-			resultBuilder.append("0000");
+			if (line.toUpperCase().contains("F")) {
+				resultBuilder.append('0');
+				resultBuilder.append(line.charAt(line.indexOf(' ')));
+				//Hacky method to get the 2 in between 2 spaces
+				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
+						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
+				resultBuilder.append(line.substring(Math.max(0, line.length() - 4))); //Four characters after last space
+			}
+			else {
+				resultBuilder.append('0');
+				resultBuilder.append(line.charAt(line.indexOf(' ') + 1));
+				resultBuilder.append(line.charAt(line.lastIndexOf(' ') + 1)); //Character after last space
+				//resultBuilder.append(line.charAt(line.length()-1)); Alternatively use the last character
+				resultBuilder.append("0000");
+			}
 			resultBuilder.append('\n');
 		}
 		else if (line.toUpperCase().startsWith(OpCodes.WOP.toString())){
 			resultBuilder.append(String.valueOf(OpCodes.WOP.hexCode));
 			if (line.toUpperCase().contains("F")) {
-				//WOP F,D 0001 > A0FD0001
 				resultBuilder.append('0');	
 				resultBuilder.append(line.charAt(line.indexOf(',') - 1));
 				resultBuilder.append(line.charAt(line.indexOf(',') + 1));
