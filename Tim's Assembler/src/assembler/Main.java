@@ -280,7 +280,7 @@ public class Main {
 			resultBuilder.append(String.valueOf(OpCodes.WTR.hexCode));
 			if (line.toUpperCase().contains("F")) {
 				resultBuilder.append('0');
-				resultBuilder.append(line.charAt(line.indexOf(' ')));
+				resultBuilder.append(line.charAt(line.indexOf(' ')+1));
 				//Hacky method to get the 2 in between 2 spaces
 				resultBuilder.append(line.substring(line.indexOf(' '), line.lastIndexOf(' '))
 						.charAt(line.substring(line.indexOf(' '), line.lastIndexOf(' ')).lastIndexOf(' ')+1));		
