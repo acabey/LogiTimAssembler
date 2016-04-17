@@ -1,20 +1,28 @@
-	 * EX: LDI 3 1234 > C3001234
-	 * Loads (hex) value "1234" into register 3
-	 * 
-	 * EX: JMP 1234   > 1F001234
-	 * Jumps to (hex) address "1234"
-	 * 
-	 * EX: JMZ D,9 10F0 > 2FD910F0
-	 * Compares the values in registers D and 9; if they are equal, then jumps to (hex) address 10F0
-	 * 
-	 * EX: ADD D,3 2 > 42D30000
-	 * Adds the values in registers D and 3, stores the result in register 2
-	 * 
-	 * EX: WTR A B > 80AB0000
-	 * Writes the data in register A into the address specified in register B
-	 * 
-	 * EX: INP TODO
-	 * 
-	 * EX: WOP TODO
-	 * WOP A,B
-	 *
+EX: LDI 3 1234 > C3001234
+Loads (hex) value "1234" into register 3
+
+EX: JMP 1234   > 1F001234
+Jumps to (hex) address "1234"
+
+EX: JMZ D,9 10F0 > 2FD910F0
+Compares the values in registers D and 9; if they are equal, then jumps to (hex) address 10F0
+
+EX: ADD F,3 2 0001 > 42F30001
+EX: ADD D,3 2 > 42D30000
+Adds the values in VAL(register F) and register 3, stores the result in register 2
+Adds the values in registers D and 3, stores the result in register 2
+
+EX: WTR A B > 80AB0000
+Writes the data in register A into the address specified in register B
+
+EX: WTR F B 0110 > 80FB0110
+Writes the data in VAL (register F) to register B
+
+EX: INP A > 9A000000
+Inputs item from keyboard into register
+
+EX: LDR D A > DAD00000
+Loads data from memory address stored in register D into register A
+
+EX: LDR F A 0110 > DAF00110
+Loads data from memory address 0110 (register F) and stores in register A
